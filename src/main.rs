@@ -1,5 +1,9 @@
 use std::io::{stderr, Write};
 
+mod vec;
+use vec::Color;
+
+
 fn main() {
     const IMAGE_WIDTH: u64 = 1024;
     const IMAGE_HEIGHT: u64 = 1024;
@@ -13,15 +17,12 @@ fn main() {
         stderr().flush().unwrap();
 
         for i in 0..IMAGE_WIDTH {
-            let r = (i as f64) / ((IMAGE_WIDTH - 1) as f64);
-            let g = (j as f64) / ((IMAGE_HEIGHT - 1) as f64);
-            let b = 0.5;
+            let pixel_color = Color::new(
+                (i as f64) / ((IMAGE_WIDTH - 1) as f64),
+                (j as f64) / ((IMAGE_HEIGHT - 1) as f64),
+                0.75);
 
-            let ir = (255.999 * r) as u64;
-            let ig = (255.999 * g) as u64;
-            let ib = (255.999 * b) as u64;
-
-            println!("{} {} {}", ir, ig, ib);
+            println!("{}", pixel_color.format_color());
         }
     }
     eprintln!("\nDone.");
