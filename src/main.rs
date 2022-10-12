@@ -1,3 +1,5 @@
+use std::io::{stderr, Write};
+
 fn main() {
     const IMAGE_WIDTH: u64 = 1024;
     const IMAGE_HEIGHT: u64 = 1024;
@@ -7,6 +9,9 @@ fn main() {
     println!("255");
 
     for j in (0..IMAGE_HEIGHT).rev() {
+        eprint!("\rScanlines: {:4}", IMAGE_HEIGHT - j);
+        stderr().flush().unwrap();
+
         for i in 0..IMAGE_WIDTH {
             let r = (i as f64) / ((IMAGE_WIDTH - 1) as f64);
             let g = (j as f64) / ((IMAGE_HEIGHT - 1) as f64);
@@ -19,4 +24,5 @@ fn main() {
             println!("{} {} {}", ir, ig, ib);
         }
     }
+    eprintln!("\nDone.");
 }
