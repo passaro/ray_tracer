@@ -43,13 +43,14 @@ fn main() {
     const IMAGE_WIDTH: u64 = 1024;
     const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
     const SAMPLES_PER_PIXEL: u64 = 100;
-    const MAX_DEPTH: u64 = 5;
+    const MAX_DEPTH: u64 = 50;
 
     // World
     let mut world = World::new();
     let mat_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
     let mat_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
     let mat_left = Rc::new(Dielectric::new(1.5));
+    let mat_left_inner = Rc::new(Dielectric::new(1.5));
     let mat_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.3));
 
     world.push(Box::new(Sphere::new(
@@ -64,6 +65,10 @@ fn main() {
         Point3::new(-1.0, 0.0, -1.0), 
         0.5, 
         mat_left)));
+    world.push(Box::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0), 
+        -0.4, 
+        mat_left_inner)));
     world.push(Box::new(Sphere::new(
         Point3::new(1.0, 0.0, -1.0), 
         0.5, 
