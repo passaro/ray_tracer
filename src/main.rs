@@ -4,17 +4,13 @@ mod ray;
 mod sphere;
 mod vec;
 
-use hit::Hit;
+use hit::{Hit, World};
 use ray::Ray;
+use sphere::Sphere;
 use vec::{Color, Point3, Vec3};
 
-
-fn ray_color(r: &Ray) -> Color {
-    let sphere = sphere::Sphere::new(
-        Point3::new(0.0, 0.0, -1.0), 
-        0.5);
-    
-    if let Some(rec) = sphere.hit(r, 0.0, f64::INFINITY) {
+fn ray_color<H: Hit>(r: &Ray, hittable: &H) -> Color {
+    if let Some(rec) = hittable.hit(r, 0.0, f64::INFINITY) {
         0.5 * (rec.normal + Color::new(1.0, 1.0, 1.0))
     } else {
         let unit_direction = r.direction().normalized();
@@ -30,6 +26,15 @@ fn main() {
     const IMAGE_WIDTH: u64 = 1024;
     const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
 
+    // World
+    let mut world = World::new();
+    world.push(Box::new(Sphere::new(
+        Point3::new(0.0, 0.0, -1.0), 
+        0.5)));
+    world.push(Box::new(Sphere::new(
+        Point3::new(0.0, -100.5, -1.0),
+        100.0)));
+
     // Camera
     let viewport_height = 2.0;
     let viewport_width = ASPECT_RATIO * viewport_height;
@@ -42,7 +47,6 @@ fn main() {
                         - horizontal / 2.0 
                         - vertical / 2.0
                         - Vec3::new(0.0, 0.0, focal_length);
-
 
     image::print_ppm_image(
         IMAGE_WIDTH, 
@@ -57,6 +61,6 @@ fn main() {
                 + u * horizontal 
                 + v * vertical 
                 - origin);
-            ray_color(&r) 
+            ray_color(&r, &world) 
         } );
 }
