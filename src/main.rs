@@ -23,7 +23,10 @@ fn ray_color<H: Hit>(r: &Ray, hittable: &H, depth: u64) -> Color {
         // let target = rec.p + rec.normal + Vec3::random_in_unit_sphere();
         
         // True Lambertian Reflection:
-        let target = rec.p + rec.normal + Vec3::random_in_unit_sphere().normalized();
+        // let target = rec.p + rec.normal + Vec3::random_in_unit_sphere().normalized();
+
+        // Hemispherical scattering:
+        let target = rec.p + Vec3::random_in_hemisphere(rec.normal);
 
         let r = Ray::new(rec.p, target - rec.p);
         0.5 * ray_color(&r, hittable, depth - 1)
