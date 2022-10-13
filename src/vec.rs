@@ -45,15 +45,6 @@ impl Vec3 {
             self[0] * other[1] - self[1] * other[0],
         ])
     }
-
-    pub fn format_color(self) -> String {
-        format!(
-            "{} {} {}",
-            (255.999 * self[0]) as u64,
-            (255.999 * self[1]) as u64,
-            (255.999 * self[2]) as u64
-        )
-    }
 }
 
 impl Index<usize> for Vec3 {

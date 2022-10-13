@@ -15,8 +15,17 @@ pub fn print_ppm_image<F: FnMut(u64, u64) -> Color>(
         stderr().flush().unwrap();
 
         for i in 0..width {
-            println!("{}", pixel_color(i,j).format_color());
+            println!("{}", format_color(pixel_color(i,j)));
         }
     }
     eprintln!("\nDone.");
+}
+
+fn format_color(color: Color) -> String {
+    format!(
+        "{} {} {}",
+        (256.0 * color.x().clamp(0.0, 0.999)) as u64,
+        (256.0 * color.y().clamp(0.0, 0.999)) as u64,
+        (256.0 * color.z().clamp(0.0, 0.999)) as u64
+    )
 }

@@ -1,13 +1,16 @@
+mod camera;
 mod hit;
 mod image;
 mod ray;
 mod sphere;
 mod vec;
 
+use camera::Camera;
 use hit::{Hit, World};
+use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
-use vec::{Color, Point3, Vec3};
+use vec::{Color, Point3};
 
 fn ray_color<H: Hit>(r: &Ray, hittable: &H) -> Color {
     if let Some(rec) = hittable.hit(r, 0.0, f64::INFINITY) {
@@ -25,6 +28,7 @@ fn main() {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u64 = 1024;
     const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
+    const SAMPLES_PER_PIXEL: u64 = 100;
 
     // World
     let mut world = World::new();
@@ -36,31 +40,30 @@ fn main() {
         100.0)));
 
     // Camera
-    let viewport_height = 2.0;
-    let viewport_width = ASPECT_RATIO * viewport_height;
-    let focal_length = 1.0;
+    const VIEWPORT_HEIGHT: f64 = 2.0;
+    const VIEWPORT_WIDTH: f64 = ASPECT_RATIO * VIEWPORT_HEIGHT;
+    const FOCAL_LENGTH: f64 = 1.0;
+    
+    let camera = Camera::new(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, FOCAL_LENGTH);
 
-    let origin = Point3::new(0.0, 0.0, 0.0);
-    let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, viewport_height, 0.0);
-    let lower_left_corner = origin 
-                        - horizontal / 2.0 
-                        - vertical / 2.0
-                        - Vec3::new(0.0, 0.0, focal_length);
-
+    let mut rng = rand::thread_rng();
     image::print_ppm_image(
         IMAGE_WIDTH, 
         IMAGE_HEIGHT, 
         |i, j| { 
             
-            let u = (i as f64) / ((IMAGE_WIDTH - 1) as f64);
-            let v = (j as f64) / ((IMAGE_HEIGHT - 1) as f64);
+            let mut pixel_color = Color::new(0.0, 0.0, 0.0);
+            for _ in 0..SAMPLES_PER_PIXEL {
+                let random_u: f64 = rng.gen();
+                let random_v: f64 = rng.gen();
 
-            let r = Ray::new(origin, 
-                lower_left_corner
-                + u * horizontal 
-                + v * vertical 
-                - origin);
-            ray_color(&r, &world) 
+                let u = ((i as f64) + random_u) / ((IMAGE_WIDTH - 1) as f64);
+                let v = ((j as f64) + random_v) / ((IMAGE_HEIGHT - 1) as f64);
+
+                let r = camera.get_ray(u, v);
+                pixel_color += ray_color(&r, &world);
+            }
+
+            pixel_color / SAMPLES_PER_PIXEL as f64 
         } );
 }
