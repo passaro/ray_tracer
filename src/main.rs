@@ -19,7 +19,12 @@ fn ray_color<H: Hit>(r: &Ray, hittable: &H, depth: u64) -> Color {
     }
     
     if let Some(rec) = hittable.hit(r, 0.001, f64::INFINITY) {
-        let target = rec.p + rec.normal + Vec3::random_in_unit_sphere();
+        // Rejection method:
+        // let target = rec.p + rec.normal + Vec3::random_in_unit_sphere();
+        
+        // True Lambertian Reflection:
+        let target = rec.p + rec.normal + Vec3::random_in_unit_sphere().normalized();
+
         let r = Ray::new(rec.p, target - rec.p);
         0.5 * ray_color(&r, hittable, depth - 1)
     } else {
