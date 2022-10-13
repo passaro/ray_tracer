@@ -56,6 +56,14 @@ impl Vec3 {
         self.map(&f64::sqrt)
     }
 
+    pub fn near_zero(self) -> bool {
+        const EPSILON: f64 = 1.0e-8;
+        
+        self[0].abs() < EPSILON 
+        && self[1].abs() < EPSILON 
+        && self[2].abs() < EPSILON
+    }
+
     pub fn random(r: Range<f64>) -> Vec3 {
         let mut rng = rand::thread_rng();
 
@@ -150,6 +158,15 @@ impl Mul<Vec3> for f64 {
         Vec3([self * rhs[0], self * rhs[1], self * rhs[2]])
     }
 }
+
+impl Mul<Vec3> for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: Vec3) -> Vec3 {
+        Vec3([self[0] * rhs[0], self[1] * rhs[1], self[2] * rhs[2]])
+    }
+}
+
 
 impl Div<f64> for Vec3 {
     type Output = Vec3;

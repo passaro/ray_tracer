@@ -1,16 +1,21 @@
 mod camera;
 mod hit;
 mod image;
+mod material;
 mod ray;
 mod sphere;
 mod vec;
 
+use std::rc::Rc;
+
 use camera::Camera;
 use hit::{Hit, World};
+use material::Lambertian;
 use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
-use vec::{Color, Point3, Vec3};
+use vec::{Color, Point3};
+
 
 fn ray_color<H: Hit>(r: &Ray, hittable: &H, depth: u64) -> Color {
     if depth <= 0 {
@@ -19,17 +24,11 @@ fn ray_color<H: Hit>(r: &Ray, hittable: &H, depth: u64) -> Color {
     }
     
     if let Some(rec) = hittable.hit(r, 0.001, f64::INFINITY) {
-        // Rejection method:
-        // let target = rec.p + rec.normal + Vec3::random_in_unit_sphere();
-        
-        // True Lambertian Reflection:
-        // let target = rec.p + rec.normal + Vec3::random_in_unit_sphere().normalized();
-
-        // Hemispherical scattering:
-        let target = rec.p + Vec3::random_in_hemisphere(rec.normal);
-
-        let r = Ray::new(rec.p, target - rec.p);
-        0.5 * ray_color(&r, hittable, depth - 1)
+        if let Some((attenuation, scattered)) = rec.material.scatter(r, &rec) {
+            attenuation * ray_color(&scattered, hittable, depth - 1)
+        } else {
+            Color::new(0.0, 0.0, 0.0)
+        }
     } else {
         let unit_direction = r.direction().normalized();
         let t = 0.5 * (unit_direction.y() + 1.0);
@@ -48,12 +47,17 @@ fn main() {
 
     // World
     let mut world = World::new();
+    let mat_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let mat_center = Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
+    
     world.push(Box::new(Sphere::new(
         Point3::new(0.0, 0.0, -1.0), 
-        0.5)));
+        0.5,
+        mat_center)));
     world.push(Box::new(Sphere::new(
         Point3::new(0.0, -100.5, -1.0),
-        100.0)));
+        100.0,
+        mat_ground)));
 
     // Camera
     const VIEWPORT_HEIGHT: f64 = 2.0;

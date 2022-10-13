@@ -1,15 +1,19 @@
+use std::rc::Rc;
+
 use super::hit::{Hit, HitRecord};
+use super::material::Scatter;
 use super::ray::Ray;
 use super::vec::Point3;
 
 pub struct Sphere {
     center: Point3,
     radius: f64,
+    material: Rc<dyn Scatter>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64) -> Sphere {
-        Sphere { center, radius }
+    pub fn new(center: Point3, radius: f64, material: Rc<dyn Scatter>) -> Sphere {
+        Sphere { center, radius, material }
     }
 }
 
@@ -37,6 +41,6 @@ impl Hit for Sphere {
         
         let p = r.at(root);
         let outward_normal = (p - self.center) / self.radius;
-        Some(HitRecord::new(r, root, outward_normal))
+        Some(HitRecord::new(r, root, outward_normal, self.material.clone()))
     }
 }
