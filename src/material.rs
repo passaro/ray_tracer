@@ -29,3 +29,26 @@ impl Scatter for Lambertian {
         Some((self.albedo, scattered))
     }
 }
+
+pub struct Metal {
+    albedo: Color
+}
+
+impl Metal {
+    pub fn new(albedo: Color) -> Metal {
+        Metal { albedo }
+    }
+}
+
+impl Scatter for Metal {
+    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<(Color, Ray)> {
+        let reflected = ray.direction().reflect(hit.normal).normalized();
+        let scattered = Ray::new(hit.p, reflected);
+
+        if scattered.direction().dot(hit.normal) > 0.0 {
+            Some((self.albedo, scattered))
+        } else {
+            None
+        }
+    }
+}

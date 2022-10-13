@@ -56,6 +56,10 @@ impl Vec3 {
         self.map(&f64::sqrt)
     }
 
+    pub fn reflect(self, n: Vec3) -> Vec3 {
+        self - 2.0 * self.dot(n) * n
+    }    
+
     pub fn near_zero(self) -> bool {
         const EPSILON: f64 = 1.0e-8;
         
