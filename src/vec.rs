@@ -1,7 +1,9 @@
 use std::{
     fmt::Display,
-    ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign},
+    ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign, Range},
 };
+
+use rand::Rng;
 
 #[derive(Clone, Copy)]
 pub struct Vec3([f64; 3]);
@@ -45,6 +47,34 @@ impl Vec3 {
             self[0] * other[1] - self[1] * other[0],
         ])
     }
+
+    pub fn map<F: Fn(f64) -> f64>(self, f: &F) -> Vec3 {
+        Vec3([f(self[0]), f(self[1]), f(self[2])])
+    }
+
+    pub fn sqrt(self) -> Vec3 {
+        self.map(&f64::sqrt)
+    }
+
+    pub fn random(r: Range<f64>) -> Vec3 {
+        let mut rng = rand::thread_rng();
+
+        Vec3([
+            rng.gen_range(r.clone()), 
+            rng.gen_range(r.clone()), 
+            rng.gen_range(r.clone()),
+        ])
+    }
+
+    pub fn random_in_unit_sphere() -> Vec3 {
+        loop {
+            let v = Vec3::random(-1.0..1.0);
+            if v.length() < 1.0 {
+                return v;
+            }
+        }
+    }
+
 }
 
 impl Index<usize> for Vec3 {
