@@ -9,22 +9,31 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(vfov: f64, aspect_ratio: f64, focal_length: f64) -> Camera {
+    pub fn new(
+        lookfrom: Point3,
+        lookat: Point3,
+        vup: Vec3,
+        vfov: f64, 
+        aspect_ratio: f64) -> Camera {
+
         // Vertical field-of-view in degrees
         let theta = std::f64::consts::PI / 180.0 * vfov;
         let viewport_height = 2.0 * (theta / 2.0).tan();
         let viewport_width = aspect_ratio * viewport_height;
 
-        let origin = Point3::new(0.0, 0.0, 0.0);
-        let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
-        let vertical = Vec3::new(0.0, viewport_height, 0.0);
-        let lower_left_corner = origin 
+        let cw = (lookfrom - lookat).normalized();
+        let cu = vup.cross(cw).normalized();
+        let cv = cw.cross(cu);
+
+        let horizontal = viewport_width * cu;
+        let vertical = viewport_height * cv;
+        let lower_left_corner = lookfrom 
             - horizontal / 2.0 
             - vertical / 2.0 
-            - Vec3::new(0.0, 0.0, focal_length);
+            - cw;
 
         Camera {
-            origin,
+            origin: lookfrom,
             lower_left_corner,
             horizontal,
             vertical,
