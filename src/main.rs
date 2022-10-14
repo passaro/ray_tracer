@@ -46,40 +46,22 @@ fn main() {
     const MAX_DEPTH: u64 = 50;
 
     // World
+    let r: f64 = (std::f64::consts::PI / 4.0).cos(); 
     let mut world = World::new();
-    let mat_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    let mat_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
-    let mat_left = Rc::new(Dielectric::new(1.5));
-    let mat_left_inner = Rc::new(Dielectric::new(1.5));
-    let mat_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.3));
 
-    world.push(Box::new(Sphere::new(
-        Point3::new(0.0, 0.0, -1.0), 
-        0.5,
-        mat_center)));
-    world.push(Box::new(Sphere::new(
-        Point3::new(0.0, -100.5, -1.0),
-        100.0,
-        mat_ground)));
-    world.push(Box::new(Sphere::new(
-        Point3::new(-1.0, 0.0, -1.0), 
-        0.5, 
-        mat_left)));
-    world.push(Box::new(Sphere::new(
-        Point3::new(-1.0, 0.0, -1.0), 
-        -0.4, 
-        mat_left_inner)));
-    world.push(Box::new(Sphere::new(
-        Point3::new(1.0, 0.0, -1.0), 
-        0.5, 
-        mat_right)));
+    let mat_left = Rc::new(Lambertian::new(Color::new(0.0, 0.0, 1.0)));
+    let mat_right = Rc::new(Lambertian::new(Color::new(1.0, 0.0, 0.0)));
+
+    let sphere_left = Sphere::new(Point3::new(-r, 0.0, -1.0), r, mat_left);
+    let sphere_right = Sphere::new(Point3::new(r, 0.0, -1.0), r, mat_right);
+
+    world.push(Box::new(sphere_left));
+    world.push(Box::new(sphere_right));
 
     // Camera
-    const VIEWPORT_HEIGHT: f64 = 2.0;
-    const VIEWPORT_WIDTH: f64 = ASPECT_RATIO * VIEWPORT_HEIGHT;
+    const VERTICAL_FIELD_OF_VIEW: f64 = 90.0;
     const FOCAL_LENGTH: f64 = 1.0;
-    
-    let camera = Camera::new(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, FOCAL_LENGTH);
+    let camera = Camera::new(VERTICAL_FIELD_OF_VIEW, ASPECT_RATIO, FOCAL_LENGTH);
 
     let mut rng = rand::thread_rng();
     image::print_ppm_image(

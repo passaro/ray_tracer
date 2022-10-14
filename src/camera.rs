@@ -9,7 +9,12 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(viewport_width: f64, viewport_height: f64, focal_length: f64) -> Camera {
+    pub fn new(vfov: f64, aspect_ratio: f64, focal_length: f64) -> Camera {
+        // Vertical field-of-view in degrees
+        let theta = std::f64::consts::PI / 180.0 * vfov;
+        let viewport_height = 2.0 * (theta / 2.0).tan();
+        let viewport_width = aspect_ratio * viewport_height;
+
         let origin = Point3::new(0.0, 0.0, 0.0);
         let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
         let vertical = Vec3::new(0.0, viewport_height, 0.0);
