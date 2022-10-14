@@ -76,12 +76,20 @@ fn main() {
 
     // Camera
     const VERTICAL_FIELD_OF_VIEW: f64 = 20.0;
+    let lookfrom = Point3::new(3.0, 3.0, 2.0);
+    let lookat = Point3::new(0.0, 0.0, -1.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let aperture = 2.0;
+    let focus_dist = (lookfrom - lookat).length();
+
     let camera = Camera::new(
-        Point3::new(-2.0, 2.0, 1.0),
-        Point3::new(0.0, 0.0, -1.0),
-        Vec3::new(0.0, 1.0, 0.0),
+        lookfrom,
+        lookat,
+        vup,
         VERTICAL_FIELD_OF_VIEW, 
-        ASPECT_RATIO);
+        ASPECT_RATIO,
+        aperture,
+        focus_dist);
 
     let mut rng = rand::thread_rng();
     image::print_ppm_image(
