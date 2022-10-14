@@ -5,7 +5,7 @@ use super::ray::Ray;
 use super::hit::HitRecord;
 
 
-pub trait Scatter {
+pub trait Scatter : Send + Sync {
     fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<(Color, Ray)>;
 }
 
