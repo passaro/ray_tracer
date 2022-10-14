@@ -75,7 +75,7 @@ fn main() {
         mat_right)));
 
     // Camera
-    const VERTICAL_FIELD_OF_VIEW: f64 = 90.0;
+    const VERTICAL_FIELD_OF_VIEW: f64 = 20.0;
     let camera = Camera::new(
         Point3::new(-2.0, 2.0, 1.0),
         Point3::new(0.0, 0.0, -1.0),
