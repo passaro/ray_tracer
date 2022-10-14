@@ -1,22 +1,22 @@
 use std::io::{stderr, Write};
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
+use crate::size::Size;
 use crate::vec::Color;
 
 pub fn print_ppm_image<F: Fn(u64, u64) -> Color + Sync + Send>(
-    width: u64, 
-    height: u64, 
+    size: Size, 
     pixel_color: F) {
 
     println!("P3");
-    println!("{} {}", width, height);
+    println!("{} {}", size.width(), size.height());
     println!("255");
 
-    for j in (0..height).rev() {
-        eprint!("\rScanlines: {:4}", height - j);
+    for j in (0..size.height()).rev() {
+        eprint!("\rScanlines: {:4}", size.height() - j);
         stderr().flush().unwrap();
 
-        let scanline: Vec<Color> = (0..width)
+        let scanline: Vec<Color> = (0..size.width())
             .into_par_iter()
             .map(|i| { pixel_color(i,j) })
             .collect();
