@@ -1,20 +1,25 @@
-use std::io::{stderr, Write};
+use std::fs::File;
+use std::io::{stdout, Write};
+use std::path::Path;
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
 use crate::size::Size;
 use crate::vec::Color;
 
-pub fn print_ppm_image<F: Fn(u64, u64) -> Color + Sync + Send>(
+pub fn save_ppm_image<F: Fn(u64, u64) -> Color + Sync + Send>(
+    image_file: &Path,
     size: Size, 
-    pixel_color: F) {
+    pixel_color: F) -> Result<(), std::io::Error> {
 
-    println!("P3");
-    println!("{} {}", size.width(), size.height());
-    println!("255");
+    let mut fs = File::create(image_file)?;
+
+    writeln!(&mut fs, "P3")?;
+    writeln!(&mut fs, "{} {}", size.width(), size.height())?;
+    writeln!(&mut fs, "255")?;
 
     for j in (0..size.height()).rev() {
-        eprint!("\rScanlines: {:4}", size.height() - j);
-        stderr().flush().unwrap();
+        print!("\rScanlines: {:4}", size.height() - j);
+        stdout().flush().unwrap();
 
         let scanline: Vec<Color> = (0..size.width())
             .into_par_iter()
@@ -22,10 +27,11 @@ pub fn print_ppm_image<F: Fn(u64, u64) -> Color + Sync + Send>(
             .collect();
 
         for color in scanline {
-            println!("{}", format_color(color));
+            writeln!(&mut fs, "{}", format_color(color))?;
         }
     }
-    eprintln!("\nDone.");
+    println!("\nDone.");
+    Ok(())
 }
 
 fn format_color(color: Color) -> String {

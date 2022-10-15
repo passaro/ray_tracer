@@ -1,6 +1,9 @@
+use std::path::Path;
+
 use rand::Rng;
 
 use super::camera::Camera;
+use super::ppm;
 use super::hit::{Hit, World};
 use super::ray::Ray;
 use super::size::Size;
@@ -41,6 +44,13 @@ impl Render {
         }
 
         (pixel_color / self.samples_per_pixel as f64).sqrt()
+    }
+
+    pub fn render_to_image(&self, image_file: &Path) -> Result<(), std::io::Error> {
+        ppm::save_ppm_image(
+            image_file,
+            self.image_size,
+            |i, j| { self.pixel_color(i, j) } )
     }
 
 }

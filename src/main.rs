@@ -1,6 +1,6 @@
 mod camera;
 mod hit;
-mod image;
+mod ppm;
 mod material;
 mod ray;
 mod render;
@@ -8,6 +8,8 @@ mod scene;
 mod size;
 mod sphere;
 mod vec;
+
+use std::path::{Path, PathBuf};
 
 use clap::Parser;
 
@@ -22,6 +24,8 @@ use vec::{Point3, Vec3};
 /// Ray Tracing in One Weekend in Rust
 struct Arguments {
     
+    image_file: PathBuf,
+
     #[arg(short='i', long, default_value_t = Size::new(1200, 800))]
     image_size: Size,
 
@@ -36,6 +40,7 @@ struct Arguments {
 }
 
 impl Arguments {
+    fn image_file(&self) -> &Path { self.image_file.as_ref() }
     fn image_size(&self) -> Size { self.image_size }
     fn samples_per_pixel(&self) -> u64 { self.samples_per_pixel }
     fn max_depth(&self) -> u64 { self.max_depth }
@@ -62,7 +67,6 @@ fn main() {
         args.max_depth(),
         args.image_size());
 
-    image::print_ppm_image(
-        args.image_size(),
-        |i, j| { render.pixel_color(i, j) } );
+    render.render_to_image(args.image_file())
+        .expect(format!("Error writing to '{}'.", args.image_file().display()).as_str());
 }
