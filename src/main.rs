@@ -1,6 +1,5 @@
 mod camera;
 mod hit;
-mod ppm;
 mod material;
 mod ray;
 mod render;

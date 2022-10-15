@@ -1,9 +1,11 @@
+use std::io::{stdout, Write};
 use std::path::Path;
 
+use image::ImageError;
 use rand::Rng;
+use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
 use super::camera::Camera;
-use super::ppm;
 use super::hit::{Hit, World};
 use super::ray::Ray;
 use super::size::Size;
@@ -46,11 +48,17 @@ impl Render {
         (pixel_color / self.samples_per_pixel as f64).sqrt()
     }
 
-    pub fn render_to_image(&self, image_file: &Path) -> Result<(), std::io::Error> {
-        ppm::save_ppm_image(
-            image_file,
-            self.image_size,
-            |i, j| { self.pixel_color(i, j) } )
+    pub fn render_to_image(&self, image_file: &Path) -> Result<(), ImageError> {
+        let buffer = render_buffer(
+            self.image_size, 
+            |i, j| { self.pixel_color(i, j) } );
+        
+        image::save_buffer(
+            image_file, 
+            &buffer[..], 
+            self.image_size.width() as u32, 
+            self.image_size.height() as u32, 
+            image::ColorType::Rgb8)
     }
 
 }
@@ -73,4 +81,32 @@ fn ray_color<H: Hit>(r: &Ray, hittable: &H, depth: u64) -> Color {
         (1.0 - t) * Color::new(1.0, 1.0, 1.0) 
         + t * Color::new(0.5, 0.7, 1.0)
     }
+}
+
+fn render_buffer<F: Fn(u64, u64) -> Color + Sync + Send>(
+    size: Size, 
+    pixel_color: F) -> Vec<u8> {
+    let buffer_size = (size.width() * size.height() * 3) as usize;
+    let mut buffer: Vec<u8> = Vec::with_capacity(buffer_size);
+    for j in (0..size.height()).rev() {
+        print!("\rScanlines: {:4}", size.height() - j);
+        stdout().flush().unwrap();
+
+        let scanline: Vec<Color> = (0..size.width())
+            .into_par_iter()
+            .map(|i| { pixel_color(i,j) })
+            .collect();
+
+        for color in scanline {
+            buffer.push(to_u8(color.x()));
+            buffer.push(to_u8(color.y()));
+            buffer.push(to_u8(color.z()));
+        }
+    }
+    println!("\nDone.");
+    buffer
+}
+
+fn to_u8(component: f64) -> u8 {
+    (256.0 * component.clamp(0.0, 0.999)) as u8
 }
