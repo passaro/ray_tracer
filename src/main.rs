@@ -66,6 +66,8 @@ fn main() {
         args.max_depth(),
         args.image_size());
 
-    render.render_to_image(args.image_file())
-        .expect(format!("Error writing to '{}'.", args.image_file().display()).as_str());
+    if let Err(e) = render.render_to_image(args.image_file()) { 
+        eprintln!("Error writing to '{}': {}.", args.image_file().display(), e);
+        std::process::exit(2);
+    }
 }
