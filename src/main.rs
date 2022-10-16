@@ -51,7 +51,7 @@ fn main() {
     let args = Arguments::parse();
 
     let camera = Camera::new(
-        Point3::new(13.0, 2.0, 3.0),
+        Point3::new(13.0, 4.0, -2.0),
         Point3::new(0.0, 0.0, 0.0),
         Vec3::new(0.0, 1.0, 0.0),
         args.vertical_field_of_view(), 

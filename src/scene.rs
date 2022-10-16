@@ -17,8 +17,8 @@ pub fn random_scene() -> World {
 
     world.push(Box::new(ground_sphere));
 
-    for a in -11..=11 {
-        for b in -11..=11 {
+    for a in -15..=15 {
+        for b in -15..=15 {
             let choose_mat: f64 = rng.gen();
             let center = Point3::new((a as f64) + rng.gen_range(0.0..0.9),
                                      0.2,
@@ -50,8 +50,8 @@ pub fn random_scene() -> World {
     }
 
     let mat1 = Arc::new(Dielectric::new(1.5));
-    let mat2 = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
-    let mat3 = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
+    let mat2 = Arc::new(Lambertian::new(Color::new(0.1, 0.5, 0.1)));
+    let mat3 = Arc::new(Metal::new(Color::new(0.7, 0.1, 0.1), 0.0));
 
     let sphere1 = Sphere::new(Point3::new(0.0, 1.0, 0.0), 1.0, mat1);
     let sphere2 = Sphere::new(Point3::new(-4.0, 1.0, 0.0), 1.0, mat2);
