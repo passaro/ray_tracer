@@ -75,9 +75,7 @@ impl Vec3 {
         && self[2].abs() < EPSILON
     }
 
-    pub fn random(r: Range<f64>) -> Vec3 {
-        let mut rng = rand::thread_rng();
-
+    pub fn random<R: Rng>(rng: &mut R, r: Range<f64>) -> Vec3 {
         Vec3([
             rng.gen_range(r.clone()), 
             rng.gen_range(r.clone()), 
@@ -86,8 +84,9 @@ impl Vec3 {
     }
 
     pub fn random_in_unit_sphere() -> Vec3 {
+        let mut thread_rng = rand::thread_rng();
         loop {
-            let v = Vec3::random(-1.0..1.0);
+            let v = Vec3::random(&mut thread_rng, -1.0..1.0);
             if v.length() < 1.0 {
                 return v;
             }

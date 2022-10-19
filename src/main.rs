@@ -36,6 +36,9 @@ struct Arguments {
 
     #[arg(short, long, default_value_t = 20.0)]
     vertical_field_of_view: f64,
+
+    #[arg(short, long, default_value_t = 42)]
+    random_seed: u64,
 }
 
 impl Arguments {
@@ -44,6 +47,7 @@ impl Arguments {
     fn samples_per_pixel(&self) -> u64 { self.samples_per_pixel }
     fn max_depth(&self) -> u64 { self.max_depth }
     fn vertical_field_of_view(&self) -> f64 { self.vertical_field_of_view }
+    fn random_seed(&self) -> u64 { self.random_seed }
 }
 
 fn main() {
@@ -60,7 +64,7 @@ fn main() {
         10.0);
 
     let render = Render::new(
-        scene::random_scene(),
+        scene::random_scene(args.random_seed()),
         camera,
         args.samples_per_pixel(),
         args.max_depth(),

@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use rand::Rng;
+use rand::{Rng, SeedableRng};
 
 use crate::sphere::Sphere;
 use crate::vec::{Color, Point3};
@@ -8,8 +8,8 @@ use crate::material::{Lambertian, Metal, Dielectric};
 use crate::hit::World;
 
 
-pub fn random_scene() -> World {
-    let mut rng = rand::thread_rng();
+pub fn random_scene(seed: u64) -> World {
+    let mut rng = rand_xoshiro::Xoshiro256PlusPlus::seed_from_u64(seed);
     let mut world = World::new();
 
     let ground_mat = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
@@ -26,14 +26,14 @@ pub fn random_scene() -> World {
 
             if choose_mat < 0.8 {
                 // Diffuse
-                let albedo = Color::random(0.0..1.0) * Color::random(0.0..1.0);
+                let albedo = Color::random(&mut rng, 0.0..1.0) * Color::random(&mut rng, 0.0..1.0);
                 let sphere_mat = Arc::new(Lambertian::new(albedo));
                 let sphere = Sphere::new(center, 0.2, sphere_mat);
 
                 world.push(Box::new(sphere));
             } else if choose_mat < 0.95 {
                 // Metal
-                let albedo = Color::random(0.4..1.0);
+                let albedo = Color::random(&mut rng, 0.4..1.0);
                 let fuzz = rng.gen_range(0.0..0.5);
                 let sphere_mat = Arc::new(Metal::new(albedo, fuzz));
                 let sphere = Sphere::new(center, 0.2, sphere_mat);
